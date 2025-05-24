@@ -34,5 +34,22 @@ do
 
   ((GUESS_COUNT++))
 
-  
+  if (( USER_GUESS == RANDOM_NUMBER ))
+  then
+    echo "You guessed it in $GUESS_COUNT tries. The secret number was $RANDOM_NUMBER. Nice job!"
+    $PSQL "UPDATE users SET games_played = games_played + 1 WHERE username = '$USERNAME';"
+
+    # Update best_game if NULL or current guess count is less
+    CURRENT_BEST=$($PSQL "SELECT best_game FROM users WHERE username='$USERNAME';")
+    if (( GUESS_COUNT < CURRENT_BEST )); then
+      $PSQL "UPDATE users SET best_game = $GUESS_COUNT WHERE username = '$USERNAME';"
+    fi
+
+    break
+  elif (( USER_GUESS > RANDOM_NUMBER )); then
+    echo "It's lower than that, guess again:"
+  else
+    echo "It's higher than that, guess again:"
+  fi
+done
 
