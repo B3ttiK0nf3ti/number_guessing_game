@@ -18,7 +18,7 @@ if [[ -z $USER_DATA ]]; then
   INSERT_RESULT=$($PSQL "INSERT INTO users(username, games_played, best_game) VALUES('$USERNAME', 0, NULL);")
 else
   # Existing user - parse data
-  IFS="|" read GAMES_PLAYED BEST_GAME <<< "$USER_DATA"
+  read GAMES_PLAYED BEST_GAME <<< "$USER_DATA"
   echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
 fi
 
@@ -41,7 +41,7 @@ do
 
     # Update best_game if NULL or current guess count is less
     CURRENT_BEST=$($PSQL "SELECT best_game FROM users WHERE username='$USERNAME';")
-    if (( GUESS_COUNT < CURRENT_BEST )); then
+    if [[ -z $CURRENT_BEST || $GUESS_COUNT -lt $CURRENT_BEST ]]; then
       $PSQL "UPDATE users SET best_game = $GUESS_COUNT WHERE username = '$USERNAME';"
     fi
 
