@@ -35,11 +35,11 @@ while true; do
   if (( GUESS == SECRET )); then
     echo "You guessed it in $GUESS_COUNT tries. The secret number was $SECRET. Nice job!"
 
-    $PSQL "UPDATE users SET games_played = games_played + 1 WHERE username = '$USERNAME';"
+    $PSQL "UPDATE users SET games_played = games_played + 1 WHERE username = '$USERNAME';" > /dev/null
 
     CURRENT_BEST=$($PSQL "SELECT best_game FROM users WHERE username='$USERNAME';")
     if [[ -z $CURRENT_BEST || $CURRENT_BEST = "NULL" ]] || (( GUESS_COUNT < CURRENT_BEST )); then
-      $PSQL "UPDATE users SET best_game = $GUESS_COUNT WHERE username = '$USERNAME';"
+      IGNORE_OUTPUT=$($PSQL "UPDATE users SET best_game = $GUESS_COUNT WHERE username = '$USERNAME';")
     fi
 
     break
